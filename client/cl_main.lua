@@ -202,13 +202,19 @@ function CameraLoop()
                 local hook = grabWebhook()
                 exports['screenshot-basic']:requestScreenshotUpload(tostring(hook), "files[]", function(data)
                     local image = json.decode(data)
+
                     local playercoords = GetEntityCoords(PlayerPedId())
                     local streetHash, crossingHash = GetStreetNameAtCoord(playercoords.x, playercoords.y, playercoords.z)
                     local streetName = GetStreetNameFromHashKey(streetHash)
                     camera = false
                     if cameraprop then DeleteEntity(cameraprop) end
                     ClearPedTasks(lPed)
-                    TriggerServerEvent("ps-camera:CreatePhoto", json.encode(image.attachments[1].proxy_url), streetName)
+                    if image ~= nil then
+                        TriggerServerEvent("ps-camera:CreatePhoto", json.encode(image.attachments[1].proxy_url), streetName)
+                    else
+                        print('Can\'t Creat photo. (Did you set a webhook?)')
+                    end
+
                     SendNUIMessage({action = "hideOverlay"})
                 end)
             end
